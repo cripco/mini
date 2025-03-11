@@ -7,7 +7,7 @@ use(solidity);
 const NAME = 'mini';
 const SYMBOL = 'mini';
 const DECIMALS = 18;
-const TOTALSUPPLY = ethers.utils.parseUnits('300000000', DECIMALS);
+const TOTALSUPPLY = ethers.utils.parseUnits('100000000000', DECIMALS);
 const VERSION = '1.0';
 const VERSION_712 = '1.0';
 
