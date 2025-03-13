@@ -9,6 +9,9 @@ import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import './libs/Ethless.sol';
 
 contract MiniCoin is ERC20PermitUpgradeable, Ethless {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() initializer {}
+
     function initialize(
         address owner_,
         string memory name_,
@@ -49,11 +52,7 @@ contract MiniCoin is ERC20PermitUpgradeable, Ethless {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable) {
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20Upgradeable) {
         super._afterTokenTransfer(from, to, amount);
     }
 
