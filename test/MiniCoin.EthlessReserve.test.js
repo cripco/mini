@@ -35,7 +35,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -60,7 +60,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -72,7 +72,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -97,7 +97,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -112,7 +112,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -137,7 +137,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -157,7 +157,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -182,7 +182,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -191,7 +191,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(inputExecute, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputExecute, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve)
             );
@@ -204,7 +204,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -229,7 +229,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -238,7 +238,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(0));
         });
@@ -251,7 +251,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -276,7 +276,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -290,7 +290,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -315,7 +315,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -333,7 +333,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -358,7 +358,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -378,7 +378,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -394,7 +394,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, zeroAddress, owner.address, amountToReserve, feeToPay, nonce, expirationBlock, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -407,7 +407,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -423,7 +423,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, user1.address, zeroAddress, amountToReserve, feeToPay, nonce, expirationBlock, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -443,7 +443,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -468,7 +468,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -477,7 +477,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 user2.address,
                 amountToReserve.add(1)
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransfer,
                 MiniCoin.address,
                 owner,
@@ -496,7 +496,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -512,7 +512,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, zeroAddress, owner.address, amountToReserve, feeToPay, nonce, expirationBlock, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -521,7 +521,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(0));
         });
@@ -533,7 +533,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -549,7 +549,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, zeroAddress, owner.address, amountToReserve, feeToPay, nonce, expirationBlock, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -558,7 +558,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputReclaim,
                 MiniCoin.address,
                 owner,
@@ -575,7 +575,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -591,7 +591,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, user1.address, zeroAddress, amountToReserve, feeToPay, nonce, expirationBlock, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -602,7 +602,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputReclaim, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(0));
         });
@@ -614,7 +614,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -639,11 +639,11 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -658,13 +658,13 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 user2.address,
                 amountToReserve - feeToPay / 2
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             const nonce = Date.now();
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -689,7 +689,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -704,13 +704,13 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 user2.address,
                 amountToReserve - feeToPay
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             const nonce = Date.now();
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -735,7 +735,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -750,13 +750,13 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 user2.address,
                 feeToPay / 2
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             const nonce = Date.now();
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -781,7 +781,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -796,7 +796,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber - 40;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -821,7 +821,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -835,7 +835,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const nonce = Date.now();
             const blockNumber = await provider.getBlockNumber();
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -851,7 +851,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const input = await MiniCoin.connect(user3).populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
             ](owner.address, user3.address, owner.address, amountToReserve, feeToPay, nonce, blockNumber, signature);
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -868,7 +868,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -893,7 +893,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -902,7 +902,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputExecute,
                 MiniCoin.address,
                 owner,
@@ -918,7 +918,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
             const blockNumber = await provider.getBlockNumber();
             const expirationBlock = blockNumber + 2000;
 
-            const signature = SignHelper.signReserve(
+            const signature = await SignHelper.signReserve(
                 4,
                 network.config.chainId,
                 MiniCoin.address,
@@ -943,7 +943,7 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 expirationBlock,
                 signature
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToReserve).sub(feeToPay)
             );
@@ -952,13 +952,13 @@ describe('MiniCoin - Ethless Reserve functions', function () {
                 owner.address,
                 nonce
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputReclaim,
                 MiniCoin.address,
                 owner,
                 ethers,
                 provider,
-                'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
+                'ERC20Reservable: reservation has not expired to be reclaimed by non-executor'
             );
         });
     });

@@ -5,12 +5,15 @@ pragma solidity ^0.8.13;
  * @title MiniCoin
  */
 
-import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol';
+
 import './libs/Ethless.sol';
 
-contract MiniCoin is ERC20PermitUpgradeable, Ethless {
+contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() initializer {}
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(
         address owner_,
@@ -22,12 +25,8 @@ contract MiniCoin is ERC20PermitUpgradeable, Ethless {
         __EIP712_init_unchained(name_, version());
         __ERC20Permit_init_unchained(name_);
         __Reservable_init_unchained();
-        __Ethless_init_unchained();
+        __ERC20Burnable_init_unchained();
         _mint(owner_, totalSupply_);
-    }
-
-    function balanceOf(address account) public view override(ERC20Upgradeable, Ethless) returns (uint256 amount) {
-        return super.balanceOf(account);
     }
 
     function chainId() public view returns (uint256) {
@@ -38,9 +37,8 @@ contract MiniCoin is ERC20PermitUpgradeable, Ethless {
         return '1.0';
     }
 
-    function burn(uint256 amount_) external {
-        require(amount_ > 0, 'MiniCoin: burn amount must be greater than 0');
-        _burn(_msgSender(), amount_);
+    function balanceOf(address account) public view override(ERC20Upgradeable, Ethless) returns (uint256 amount) {
+        return Ethless.balanceOf(account);
     }
 
     function _beforeTokenTransfer(
@@ -48,6 +46,7 @@ contract MiniCoin is ERC20PermitUpgradeable, Ethless {
         address to,
         uint256 amount
     ) internal virtual override(ERC20Upgradeable) {
+        require(amount > 0, 'MiniCoin: Amount must be greater than 0');
         require(from == address(0) || balanceOf(from) >= amount, 'MiniCoin: Insufficient balance');
         super._beforeTokenTransfer(from, to, amount);
     }

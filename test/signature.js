@@ -1,50 +1,7 @@
 const { ethers, network } = require('hardhat');
-var Web3 = require('web3');
-var web3 = new Web3(Web3.givenProvider);
 
-module.exports = {
-    signBurn: function (domain, chainId, contractAddress, sourceAddress, sourcePrivateKey, amount, fee, nonce) {
-        var hash = web3.utils.soliditySha3(
-            { t: 'uint8', v: domain },
-            { t: 'uint256', v: chainId },
-            { t: 'address', v: contractAddress },
-            { t: 'address', v: sourceAddress },
-            { t: 'uint256', v: amount },
-            { t: 'uint256', v: fee },
-            { t: 'uint256', v: nonce }
-        );
-
-        var obj = web3.eth.accounts.sign(hash, sourcePrivateKey);
-        var signature = obj.signature;
-        return signature;
-    },
-    signTransfer: function (
-        domain,
-        chainId,
-        contractAddress,
-        sourceAddress,
-        sourcePrivateKey,
-        recipientAddress,
-        amount,
-        fee,
-        nonce
-    ) {
-        var hash = web3.utils.soliditySha3(
-            { t: 'uint8', v: domain },
-            { t: 'uint256', v: chainId },
-            { t: 'address', v: contractAddress },
-            { t: 'address', v: sourceAddress },
-            { t: 'address', v: recipientAddress },
-            { t: 'uint256', v: amount },
-            { t: 'uint256', v: fee },
-            { t: 'uint256', v: nonce }
-        );
-
-        var obj = web3.eth.accounts.sign(hash, sourcePrivateKey);
-        var signature = obj.signature;
-        return signature;
-    },
-    signReserve: function (
+module.exports = {   
+    signReserve: async function (
         domain,
         chainId,
         contractAddress,
@@ -57,23 +14,75 @@ module.exports = {
         nonce,
         expiryBlockNum
     ) {
-        var hash = web3.utils.soliditySha3(
-            { t: 'uint8', v: domain },
-            { t: 'uint256', v: chainId },
-            { t: 'address', v: contractAddress },
-            { t: 'address', v: sourceAddress },
-            { t: 'address', v: targetAddress },
-            { t: 'address', v: executorAddress },
-            { t: 'uint256', v: amount },
-            { t: 'uint256', v: fee },
-            { t: 'uint256', v: nonce },
-            { t: 'uint256', v: expiryBlockNum }
-        );
+        const wallet = new ethers.Wallet(sourcePrivateKey);
 
-        var obj = web3.eth.accounts.sign(hash, sourcePrivateKey);
-        var signature = obj.signature;
+        // Construct the hash (same as in Solidity)
+        const types = [
+            'uint8', 'uint256', 'address', 'address', 'address', 'address',
+            'uint256', 'uint256', 'uint256', 'uint256'
+        ];
 
+        const values = [
+            domain, chainId, contractAddress, sourceAddress, targetAddress, executorAddress,
+            amount, fee, nonce, expiryBlockNum
+        ];
+
+        const hash = ethers.utils.solidityKeccak256(types, values);
+
+        const signature = await wallet.signMessage(ethers.utils.arrayify(hash));
         return signature;
+    },
+    signTransfer: async function (
+        name,
+        version,
+        contractAddress,
+        wallet,
+        targetAddress,
+        amount,
+        nonce,
+        expirationTimestamp
+    ) {
+        const signature = await wallet._signTypedData(
+            {
+                name,
+                version,
+                chainId: network.config.chainId,
+                verifyingContract: contractAddress
+            },
+            {
+                // Transfer(address sender,address recipient,uint256 amount,uint256 nonce,uint256 deadline)
+                Transfer: [
+                    {
+                        name: 'sender',
+                        type: 'address'
+                    },
+                    {
+                        name: 'recipient',
+                        type: 'address'
+                    },
+                    {
+                        name: 'amount',
+                        type: 'uint256'
+                    },
+                    {
+                        name: 'nonce',
+                        type: 'uint256'
+                    },
+                    {
+                        name: 'deadline',
+                        type: 'uint256'
+                    }
+                ]
+            },
+            {
+                sender: wallet.address,
+                recipient: targetAddress,
+                amount: amount,
+                nonce,
+                deadline: expirationTimestamp
+            }
+        );
+        return ethers.utils.splitSignature(signature);
     },
     signPermit: async function (
         name,

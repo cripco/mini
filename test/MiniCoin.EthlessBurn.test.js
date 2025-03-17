@@ -3,7 +3,8 @@ const { expect, use } = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { ethers, network } = require('hardhat');
 const TestHelper = require('./shared');
-const SignHelper = require('./signature');
+const ErrorMessages = require('./errorMessages');
+
 use(solidity);
 
 let owner;
@@ -24,161 +25,246 @@ describe('MiniCoin - Ethless Burn functions', function () {
     });
 
     describe('MiniCoin - Regular Ethless Burn', async function () {
-        const amountToBurn = 100;
-        const feeToPay = 10;
+        const amountToBurn = TestHelper.getRandomIntInRange(10, 200);
 
         it('Test Ethless burn', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
-
-            const nonce = Date.now();
-            const signature = SignHelper.signBurn(
-                1,
-                network.config.chainId,
-                MiniCoin.address,
-                owner.address,
-                owner.privateKey,
-                amountToBurn,
-                feeToPay,
-                nonce
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            await TestHelper.executePermitFlow(provider, MiniCoin, owner, user3, user3, amountToBurn);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                amountToBurn
             );
-            const input = await MiniCoin.connect(user3).populateTransaction[
-                'burn(address,uint256,uint256,uint256,bytes)'
-            ](owner.address, amountToBurn, feeToPay, nonce, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToBurn)
             );
-            expect(await MiniCoin.balanceOf(user3.address)).to.equal(ethers.BigNumber.from(feeToPay));
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                0
+            );
+        });
+
+        it('Test Ethless burn lesser than permit', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            await TestHelper.executePermitFlow(provider, MiniCoin, owner, user3, user3, amountToBurn + 1);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance).sub(amountToBurn)
+            );
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                1
+            );
+        });
+
+        it('Test Ethless burn with approve', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+
+            const inputApprove = await MiniCoin.populateTransaction.approve(
+                user3.address,
+                amountToBurn
+            );
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                amountToBurn
+            );
+
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance).sub(amountToBurn)
+            );
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                0
+            );
+        });
+
+
+        it('Test Ethless burn lesser than approve', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            const inputApprove = await MiniCoin.populateTransaction.approve(
+                user3.address,
+                amountToBurn + 1
+            );
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance).sub(amountToBurn)
+            );
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                1
+            );
+        });
+
+
+        it('Test Ethless burn with different submitter from permit', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            await TestHelper.executePermitFlow(provider, MiniCoin, owner, user3, user2, amountToBurn);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance).sub(amountToBurn)
+            );
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+        });
+
+        it('Test Ethless burn from received amount', async () => {
+            await MiniCoin["transfer(address,uint256)"](user1.address, amountToBurn);
+            expect(await MiniCoin.balanceOf(user1.address)).to.equal(
+                amountToBurn
+            );
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            await TestHelper.executePermitFlow(provider, MiniCoin, user1, user3, user2, amountToBurn);
+            const input = await MiniCoin.populateTransaction.burnFrom(user1.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(user1.address)).to.equal(0);
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
+        });
+
+
+        it('Test Ethless burn some of the received amount', async () => {
+            await MiniCoin["transfer(address,uint256)"](user1.address, amountToBurn);
+            expect(await MiniCoin.balanceOf(user1.address)).to.equal(
+                amountToBurn
+            );
+            const newAmountToBurn = amountToBurn - 3;
+            const originalBalanceSubmitter = await MiniCoin.balanceOf(user3.address);
+            await TestHelper.executePermitFlow(provider, MiniCoin, user1, user3, user2, amountToBurn);
+            const input = await MiniCoin.populateTransaction.burnFrom(user1.address, newAmountToBurn);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect(await MiniCoin.balanceOf(user1.address)).to.equal(amountToBurn - newAmountToBurn);
+            expect(await MiniCoin.balanceOf(user3.address)).to.equal(originalBalanceSubmitter);
         });
     });
 
     describe('MiniCoin - Test expecting failure Ethless Burn', async function () {
-        const amountToBurn = 100;
-        const feeToPay = 10;
+        const amountToBurn = TestHelper.getRandomIntInRange(10, 200);
 
-        it('Test Ethless burn while reusing the same nonce (and signature) on the second burn', async () => {
+        it('Test Ethless burn when there is no permit', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const nonce = Date.now();
-            const signature = SignHelper.signBurn(
-                1,
-                network.config.chainId,
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+
+            await TestHelper.submitTxnAndCheckResult(
+                input,
                 MiniCoin.address,
-                owner.address,
-                owner.privateKey,
-                amountToBurn,
-                feeToPay,
-                nonce
+                user3,
+                ethers,
+                provider,
+                ErrorMessages.ERC20_INSUFFICIENT_ALLOWANCE
             );
-            const input = await MiniCoin.connect(user3).populateTransaction[
-                'burn(address,uint256,uint256,uint256,bytes)'
-            ](owner.address, amountToBurn, feeToPay, nonce, signature);
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
-                ethers.BigNumber.from(originalBalance).sub(amountToBurn)
-            );
-            expect(await MiniCoin.balanceOf(user3.address)).to.equal(ethers.BigNumber.from(feeToPay));
-
-            await TestHelper.checkResult(
-                input,
-                MiniCoin.address,
-                user3,
-                ethers,
-                provider,
-                'Ethless: nonce already used'
+                ethers.BigNumber.from(originalBalance)
             );
         });
 
-        it('Test Ethless burn while amountToBurn + feeToPay is higher than the balance', async () => {
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
-                user1.address,
-                amountToBurn - feeToPay / 2
-            );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
-
-            const nonce = Date.now();
-            const signature = SignHelper.signBurn(
-                1,
-                network.config.chainId,
-                MiniCoin.address,
-                user1.address,
-                user1.privateKey,
-                amountToBurn,
-                feeToPay,
-                nonce
-            );
-            const input = await MiniCoin.connect(user3).populateTransaction[
-                'burn(address,uint256,uint256,uint256,bytes)'
-            ](user1.address, amountToBurn, feeToPay, nonce, signature);
-            await TestHelper.checkResult(
+        it('Test Ethless self-burning without permit', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
-                user3,
+                owner,
                 ethers,
                 provider,
-                'MiniCoin: Insufficient balance'
+                ErrorMessages.ERC20_INSUFFICIENT_ALLOWANCE
+            );
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance)
             );
         });
 
-        it('Test Ethless burn while amountToBurn is higher than the balance', async () => {
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
-                user1.address,
-                amountToBurn - feeToPay
-            );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
-
-            const nonce = Date.now();
-            const signature = SignHelper.signBurn(
-                1,
-                network.config.chainId,
-                MiniCoin.address,
-                user1.address,
-                user1.privateKey,
-                amountToBurn,
-                feeToPay,
-                nonce
-            );
-            const input = await MiniCoin.connect(user3).populateTransaction[
-                'burn(address,uint256,uint256,uint256,bytes)'
-            ](user1.address, amountToBurn, feeToPay, nonce, signature);
-            await TestHelper.checkResult(
+        it('Test Ethless burn more than permit', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const permitAmount = amountToBurn - 1;
+            await TestHelper.executePermitFlow(provider, MiniCoin, owner, user3, user3, permitAmount);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
                 ethers,
                 provider,
-                'MiniCoin: Insufficient balance'
+                ErrorMessages.ERC20_INSUFFICIENT_ALLOWANCE
+            );
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance)
+            );
+
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                permitAmount
             );
         });
 
-        it('Test Ethless burn while feeToPay is higher than the balance', async () => {
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
-                user1.address,
-                feeToPay / 2
-            );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
-
-            const nonce = Date.now();
-            const signature = SignHelper.signBurn(
-                1,
-                network.config.chainId,
-                MiniCoin.address,
-                user1.address,
-                user1.privateKey,
-                amountToBurn,
-                feeToPay,
-                nonce
-            );
-            const input = await MiniCoin.connect(user3).populateTransaction[
-                'burn(address,uint256,uint256,uint256,bytes)'
-            ](user1.address, amountToBurn, feeToPay, nonce, signature);
-            await TestHelper.checkResult(
+        it('Test Ethless burn multiple time than permit', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const amountAfterBurn = ethers.BigNumber.from(originalBalance).sub(amountToBurn);
+            await TestHelper.executePermitFlow(provider, MiniCoin, owner, user3, user3, amountToBurn);
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
                 ethers,
                 provider,
-                'MiniCoin: Insufficient balance'
+                0
+            );
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                amountAfterBurn
+            );
+
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                0
+            );
+
+            const input1 = await MiniCoin.populateTransaction.burnFrom(owner.address, 1);
+            await TestHelper.submitTxnAndCheckResult(
+                input1,
+                MiniCoin.address,
+                user3,
+                ethers,
+                provider,
+                ErrorMessages.ERC20_INSUFFICIENT_ALLOWANCE
+            );
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                amountAfterBurn
+            );
+        });
+
+        it('Test Ethless burn more than approved', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+            const amountToApprove = amountToBurn - 1;
+            const inputApprove = await MiniCoin.populateTransaction.approve(
+                user3.address,
+                amountToApprove
+            );
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+
+            const input = await MiniCoin.populateTransaction.burnFrom(owner.address, amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(
+                input,
+                MiniCoin.address,
+                user3,
+                ethers,
+                provider,
+                ErrorMessages.ERC20_INSUFFICIENT_ALLOWANCE
+            );
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance)
+            );
+
+            expect(await MiniCoin.allowance(owner.address, user3.address)).to.equal(
+                amountToApprove
             );
         });
     });
