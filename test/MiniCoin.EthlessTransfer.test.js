@@ -15,7 +15,7 @@ let MiniCoin;
 let provider;
 const zeroAddress = '0x0000000000000000000000000000000000000000';
 
-const feeToPay  = 0;
+const feeToPay = 0;
 
 describe('MiniCoin - Ethless Transfer functions', function () {
     before(async () => {
@@ -27,15 +27,11 @@ describe('MiniCoin - Ethless Transfer functions', function () {
     });
 
     describe('MiniCoin - Regular Ethless Transfer', async function () {
-
         it('Test Ethless transfer', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
             const amountToTransfer = TestHelper.getRandomIntInRange(10, 200);
 
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -68,17 +64,14 @@ describe('MiniCoin - Ethless Transfer functions', function () {
         });
 
         it('Test Ethless transfer when amountToTransfer is the same balance', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
 
             const currentBalance = await MiniCoin.balanceOf(owner.address);
             expect(currentBalance).to.be.above(0n);
-            
+
             const splitSignature = await SignHelper.signTransfer(
                 TestHelper.NAME,
                 TestHelper.VERSION_712,
@@ -99,14 +92,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 splitSignature.s
             );
 
-            await TestHelper.submitTxnAndCheckResult(
-                input,
-                MiniCoin.address,
-                user3,
-                ethers,
-                provider,
-                0            
-            );
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(0n);
             expect(await MiniCoin.balanceOf(user2.address)).to.equal(ethers.BigNumber.from(currentBalance));
         });
@@ -114,7 +100,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
 
     describe('MiniCoin - Test expecting failure Ethless Transfer', async function () {
         const amountToTransfer = TestHelper.getRandomIntInRange(10, 200);
-        
+
         beforeEach(async () => {
             const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
                 user1.address,
@@ -126,10 +112,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
         it('Test Ethless transfer while reusing the signature on the second transfer', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -154,7 +137,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 splitSignature.s
             );
 
-            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);   
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToTransfer)
@@ -173,10 +156,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
         it('Test Ethless transfer while reusing the same nonce on the second transfer', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -235,16 +215,11 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 ethers,
                 provider,
                 ErrorMessages.ETHLESS_INVALID_SIGNATURE
-
             );
         });
 
         it('Test Ethless transfer when amountToTransfer is higher than the balance', async () => {
-            
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -253,7 +228,7 @@ describe('MiniCoin - Ethless Transfer functions', function () {
 
             expect(currentBalance).to.be.above(0n);
 
-            const overBalance = currentBalance.add("1");
+            const overBalance = currentBalance.add('1');
 
             const splitSignature = await SignHelper.signTransfer(
                 TestHelper.NAME,
@@ -283,14 +258,10 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 provider,
                 ErrorMessages.MINICOIN_INSUFFICIENT_BALANCE
             );
-        });    
+        });
 
         it('Test Ethless transfer when amountToTransfer is higher than the signed one', async () => {
-            
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -323,14 +294,10 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 provider,
                 ErrorMessages.ETHLESS_INVALID_SIGNATURE
             );
-        });   
+        });
 
         it('Test Ethless transfer when amountToTransfer is lower than the signed one', async () => {
-            
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -363,17 +330,13 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 provider,
                 ErrorMessages.ETHLESS_INVALID_SIGNATURE
             );
-        });  
-        
+        });
+
         it('Test Ethless transfer when the deadline passed', async () => {
-            
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
-            const expirationTimestamp = block.timestamp;          
+            const expirationTimestamp = block.timestamp;
 
             const splitSignature = await SignHelper.signTransfer(
                 TestHelper.NAME,
@@ -403,7 +366,6 @@ describe('MiniCoin - Ethless Transfer functions', function () {
                 provider,
                 ErrorMessages.ETHLESS_EXPIRED_DEADLINE
             );
-        });   
-
+        });
     });
 });

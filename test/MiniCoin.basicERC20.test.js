@@ -69,7 +69,14 @@ describe('MiniCoin - Basic ERC20 functions', function () {
                 user2.address,
                 amountToIncrease
             );
-            await TestHelper.submitTxnAndCheckResult(inputIncreaseAllowance, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(
+                inputIncreaseAllowance,
+                MiniCoin.address,
+                user1,
+                ethers,
+                provider,
+                0
+            );
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal(
                 amountToIncrease.toString()
             );
@@ -88,7 +95,14 @@ describe('MiniCoin - Basic ERC20 functions', function () {
                 user2.address,
                 amountToDecrease
             );
-            await TestHelper.submitTxnAndCheckResult(inputDecreaseAllowance, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(
+                inputDecreaseAllowance,
+                MiniCoin.address,
+                user1,
+                ethers,
+                provider,
+                0
+            );
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal((50).toString());
         });
     });

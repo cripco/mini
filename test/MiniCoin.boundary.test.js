@@ -32,7 +32,9 @@ describe('MiniCoin - Boundary', function () {
     describe('Test floating point on different fn()', () => {
         it('Test burn() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             let msg;
             try {
                 const inputBurn = await MiniCoin.populateTransaction['burn(uint256)'](amount);
@@ -46,7 +48,9 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test transfer() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             let msg;
             try {
                 const inputTransfer = await MiniCoin.populateTransaction['transfer(address,uint256)'](
@@ -54,7 +58,14 @@ describe('MiniCoin - Boundary', function () {
                     amount,
                     { from: owner.address }
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    owner,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -65,7 +76,9 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test transferFrom() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             const inputApprove = await MiniCoin.populateTransaction.approve(user1.address, 1000);
             await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
 
@@ -76,7 +89,14 @@ describe('MiniCoin - Boundary', function () {
                     user2.address,
                     amount
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    user1,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -87,11 +107,10 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test transfer(w/ signature) w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -128,11 +147,10 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test permit(w/ signature) w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -165,13 +183,17 @@ describe('MiniCoin - Boundary', function () {
                 msg = err.code;
             }
 
-            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(ethers.BigNumber.from(originalAllowance));
+            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(
+                ethers.BigNumber.from(originalAllowance)
+            );
             expect(msg).to.equal(ErrorMessages.NUMERIC_FAULT_CODE);
         });
 
         it('Test reserve(w/ signature) w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
 
             const feeToPay = 10;
             const nonce = Date.now();
@@ -209,7 +231,9 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test approve() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             let msg;
             try {
                 const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, amount);
@@ -223,7 +247,9 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test increaseAllowance() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, 1000);
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
@@ -249,15 +275,14 @@ describe('MiniCoin - Boundary', function () {
 
         it('Test decreaseAllowance() w/ floating point', async () => {
             const chance = new Chance();
-            const amount = chance.floating({ min: 0, max: 1000, fixed: 7 }) + chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
+            const amount =
+                chance.floating({ min: 0, max: 1000, fixed: 7 }) +
+                chance.floating({ min: 0.0000001, max: 0.0000009, fixed: 7 });
             const inputApprove = await MiniCoin.populateTransaction.approve(MiniCoin.address, 1000);
             await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
-                const input = await MiniCoin.populateTransaction.decreaseAllowance(
-                    MiniCoin.address,
-                    amount
-                );
+                const input = await MiniCoin.populateTransaction.decreaseAllowance(MiniCoin.address, amount);
                 msg = await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             } catch (err) {
                 msg = err.code;
@@ -292,7 +317,14 @@ describe('MiniCoin - Boundary', function () {
                     amount,
                     { from: owner.address }
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    owner,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -317,7 +349,14 @@ describe('MiniCoin - Boundary', function () {
                     user2.address,
                     amount
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    user1,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -330,10 +369,7 @@ describe('MiniCoin - Boundary', function () {
             const chance = new Chance();
             const amount = chance.integer({ min: -10000, max: -1 });
 
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -360,7 +396,6 @@ describe('MiniCoin - Boundary', function () {
                     splitSignature.s
                 );
 
-
                 msg = await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             } catch (err) {
                 msg = err.code;
@@ -373,10 +408,7 @@ describe('MiniCoin - Boundary', function () {
         it('Test permit(w/ signature) w/ negative number', async () => {
             const chance = new Chance();
             const amount = chance.integer({ min: -10000, max: -1 });
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -409,7 +441,9 @@ describe('MiniCoin - Boundary', function () {
                 msg = err.code;
             }
 
-            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(ethers.BigNumber.from(originalAllowance));
+            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(
+                ethers.BigNumber.from(originalAllowance)
+            );
             expect(msg).to.equal(ErrorMessages.INVALID_ARGUMENT_CODE);
         });
 
@@ -468,10 +502,7 @@ describe('MiniCoin - Boundary', function () {
         it('Test increaseAllowance() w/ negative number', async () => {
             const chance = new Chance();
             const amount = chance.integer({ min: -10000, max: -1 });
-            const input = await MiniCoin.populateTransaction.approve(
-                MiniCoin.address,
-                ethers.BigNumber.from(10000)
-            );
+            const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, ethers.BigNumber.from(10000));
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
@@ -503,10 +534,7 @@ describe('MiniCoin - Boundary', function () {
             await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
-                const input = await MiniCoin.populateTransaction.decreaseAllowance(
-                    MiniCoin.address,
-                    amount
-                );
+                const input = await MiniCoin.populateTransaction.decreaseAllowance(MiniCoin.address, amount);
                 msg = await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             } catch (err) {
                 msg = err.code;
@@ -520,7 +548,14 @@ describe('MiniCoin - Boundary', function () {
         const amount = 0;
         it('Test burn() w/ zero(0) number', async () => {
             const inputBurn = await MiniCoin.populateTransaction['burn(uint256)'](amount);
-            msg = await TestHelper.submitTxnAndCheckResult(inputBurn, MiniCoin.address, owner, ethers, provider, ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO);
+            msg = await TestHelper.submitTxnAndCheckResult(
+                inputBurn,
+                MiniCoin.address,
+                owner,
+                ethers,
+                provider,
+                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+            );
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
 
@@ -530,7 +565,14 @@ describe('MiniCoin - Boundary', function () {
                 amount,
                 { from: owner.address }
             );
-            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO);
+            await TestHelper.submitTxnAndCheckResult(
+                inputTransfer,
+                MiniCoin.address,
+                owner,
+                ethers,
+                provider,
+                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+            );
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(0));
@@ -549,17 +591,21 @@ describe('MiniCoin - Boundary', function () {
                 user2.address,
                 amount
             );
-            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO);
+            await TestHelper.submitTxnAndCheckResult(
+                inputTransfer,
+                MiniCoin.address,
+                user1,
+                ethers,
+                provider,
+                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+            );
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user2.address)).to.equal(ethers.BigNumber.from(0));
         });
 
         it('Test transfer(w/ signature) w/ negative number', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -584,15 +630,19 @@ describe('MiniCoin - Boundary', function () {
                 splitSignature.s
             );
 
-            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO);
+            await TestHelper.submitTxnAndCheckResult(
+                input,
+                MiniCoin.address,
+                owner,
+                ethers,
+                provider,
+                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+            );
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
 
         it('Test permit(w/ signature) w/ zero(0)', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -619,7 +669,9 @@ describe('MiniCoin - Boundary', function () {
             );
 
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
-            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(ethers.BigNumber.from(originalAllowance));
+            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(
+                ethers.BigNumber.from(originalAllowance)
+            );
         });
 
         it('Test reserve(w/ signature) w/ zero(0) number', async () => {
@@ -643,17 +695,10 @@ describe('MiniCoin - Boundary', function () {
             );
             const input = await MiniCoin.populateTransaction[
                 'reserve(address,address,address,uint256,uint256,uint256,uint256,bytes)'
-            ](
-                owner.address,
-                user1.address,
-                owner.address,
-                amount,
-                feeToPay,
-                nonce,
-                expirationBlock,
-                signature,
-                { from: owner.address, gasLimit: ethers.utils.hexlify(3000000) }
-            );
+            ](owner.address, user1.address, owner.address, amount, feeToPay, nonce, expirationBlock, signature, {
+                from: owner.address,
+                gasLimit: ethers.utils.hexlify(3000000)
+            });
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
@@ -666,16 +711,20 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test increaseAllowance() w/ zero(0) number', async () => {
-            const input = await MiniCoin.populateTransaction.approve(
-                MiniCoin.address,
-                ethers.BigNumber.from(10000)
-            );
+            const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, ethers.BigNumber.from(10000));
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             const inputIncreaseAllowance = await MiniCoin.populateTransaction.increaseAllowance(
                 MiniCoin.address,
                 amount
             );
-            await TestHelper.submitTxnAndCheckResult(inputIncreaseAllowance, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(
+                inputIncreaseAllowance,
+                MiniCoin.address,
+                owner,
+                ethers,
+                provider,
+                0
+            );
 
             expect(await MiniCoin.allowance(owner.address, MiniCoin.address)).to.equal(ethers.BigNumber.from(10000));
         });
@@ -715,7 +764,14 @@ describe('MiniCoin - Boundary', function () {
                     amount,
                     { from: owner.address }
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    owner,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.fault;
             }
@@ -738,7 +794,14 @@ describe('MiniCoin - Boundary', function () {
                     user2.address,
                     amount
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    user1,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.fault;
             }
@@ -748,10 +811,7 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test transfer(w/ signature) w/ overflow', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -787,10 +847,7 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test permit(w/ signature) w/ overflow', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -823,7 +880,9 @@ describe('MiniCoin - Boundary', function () {
                 msg = err.fault;
             }
 
-            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(ethers.BigNumber.from(originalAllowance));
+            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(
+                ethers.BigNumber.from(originalAllowance)
+            );
             expect(msg).to.equal(ErrorMessages.OVERFLOW_FAULT_CODE);
         });
 
@@ -875,10 +934,7 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test increaseAllowance() w/ overflow', async () => {
-            const input = await MiniCoin.populateTransaction.approve(
-                MiniCoin.address,
-                ethers.BigNumber.from(10000)
-            );
+            const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, ethers.BigNumber.from(10000));
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
@@ -909,10 +965,7 @@ describe('MiniCoin - Boundary', function () {
             await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
-                const input = await MiniCoin.populateTransaction.decreaseAllowance(
-                    MiniCoin.address,
-                    amount
-                );
+                const input = await MiniCoin.populateTransaction.decreaseAllowance(MiniCoin.address, amount);
                 msg = await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             } catch (err) {
                 msg = err.fault;
@@ -935,7 +988,7 @@ describe('MiniCoin - Boundary', function () {
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(msg).to.equal(ErrorMessages.INVALID_ARGUMENT_CODE);
         });
-      
+
         it('Test transfer() w/ empty string', async () => {
             let msg;
             try {
@@ -944,7 +997,14 @@ describe('MiniCoin - Boundary', function () {
                     emptyString,
                     { from: owner.address }
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    owner,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -967,7 +1027,14 @@ describe('MiniCoin - Boundary', function () {
                     user2.address,
                     emptyString
                 );
-                msg = await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, 0);
+                msg = await TestHelper.submitTxnAndCheckResult(
+                    inputTransfer,
+                    MiniCoin.address,
+                    user1,
+                    ethers,
+                    provider,
+                    0
+                );
             } catch (err) {
                 msg = err.code;
             }
@@ -977,10 +1044,7 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test transfer(w/ signature) w/ empty string', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -1016,10 +1080,7 @@ describe('MiniCoin - Boundary', function () {
         });
 
         it('Test permit(w/ signature) w/ empty string', async () => {
-            const [blockNumber, nonce] = await Promise.all([
-                provider.getBlockNumber(),
-                MiniCoin.nonces(owner.address)
-            ]);
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -1052,11 +1113,12 @@ describe('MiniCoin - Boundary', function () {
                 msg = err.code;
             }
 
-            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(ethers.BigNumber.from(originalAllowance));
+            expect(await MiniCoin.allowance(owner.address, user2.address)).to.equal(
+                ethers.BigNumber.from(originalAllowance)
+            );
             expect(msg).to.equal(ErrorMessages.INVALID_ARGUMENT_CODE);
         });
 
-              
         it('Test reserve(w/ signature) w/ empty string', async () => {
             const feeToPay = 10;
             const nonce = Date.now();
@@ -1113,10 +1175,7 @@ describe('MiniCoin - Boundary', function () {
         });
         it('Test increaseAllowance() w/ empty string', async () => {
             const emptyString = '';
-            const input = await MiniCoin.populateTransaction.approve(
-                MiniCoin.address,
-                ethers.BigNumber.from(10000)
-            );
+            const input = await MiniCoin.populateTransaction.approve(MiniCoin.address, ethers.BigNumber.from(10000));
             await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
@@ -1147,10 +1206,7 @@ describe('MiniCoin - Boundary', function () {
             await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
             let msg;
             try {
-                const input = await MiniCoin.populateTransaction.decreaseAllowance(
-                    MiniCoin.address,
-                    emptyString
-                );
+                const input = await MiniCoin.populateTransaction.decreaseAllowance(MiniCoin.address, emptyString);
                 msg = await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             } catch (err) {
                 msg = err.code;
@@ -1158,5 +1214,5 @@ describe('MiniCoin - Boundary', function () {
             expect(await MiniCoin.allowance(owner.address, MiniCoin.address)).to.equal(ethers.BigNumber.from(10000));
             expect(msg).to.equal(ErrorMessages.INVALID_ARGUMENT_CODE);
         });
-    });   
+    });
 });

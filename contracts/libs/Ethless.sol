@@ -13,7 +13,7 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
     using ECDSAUpgradeable for bytes32;
 
     // keccak256("Transfer(address sender,address recipient,uint256 amount,uint256 nonce,uint256 deadline)")
-     bytes32 private constant _TRANSFER_TYPEHASH = 0xa43cfdcd630933b29083d1c5116d122bcc478eab04dd62c15dd45c3bdc58ce85;
+    bytes32 private constant _TRANSFER_TYPEHASH = 0xa43cfdcd630933b29083d1c5116d122bcc478eab04dd62c15dd45c3bdc58ce85;
 
     enum EthlessTxnType {
         NONE, // 0, Placeholder for legacy type
@@ -55,17 +55,19 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
         bytes32 r,
         bytes32 s
     ) external virtual {
-        require(block.timestamp <= deadline, "Ethless: expired deadline");
+        require(block.timestamp <= deadline, 'Ethless: expired deadline');
 
-        bytes32 structHash = keccak256(abi.encode(_TRANSFER_TYPEHASH, sender, recipient, amount, _useNonce(sender), deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(_TRANSFER_TYPEHASH, sender, recipient, amount, _useNonce(sender), deadline)
+        );
 
         bytes32 hash = _hashTypedDataV4(structHash);
 
         address signer = ECDSAUpgradeable.recover(hash, v, r, s);
-        require(signer == sender, "Ethless: invalid signature");
+        require(signer == sender, 'Ethless: invalid signature');
 
         _transfer(signer, recipient, amount);
-    }  
+    }
 
     function reserve(
         address signer_,
@@ -99,9 +101,13 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
         return true;
     }
 
-     function balanceOf(
-        address account
-    ) public view virtual override(ERC20Upgradeable, ERC20Reservable) returns (uint256 amount) {
+    function balanceOf(address account)
+        public
+        view
+        virtual
+        override(ERC20Upgradeable, ERC20Reservable)
+        returns (uint256 amount)
+    {
         return ERC20Reservable.balanceOf(account);
     }
 

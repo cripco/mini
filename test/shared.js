@@ -13,7 +13,7 @@ const VERSION = '1.0';
 const VERSION_712 = '1.0';
 
 const STANDARD_MINT_AMOUNT = ethers.utils.parseEther('1000');
-const ETHLESS_TRANSFER_SIGNATURE = "transfer(address,address,uint256,uint256,uint8,bytes32,bytes32)";
+const ETHLESS_TRANSFER_SIGNATURE = 'transfer(address,address,uint256,uint256,uint8,bytes32,bytes32)';
 
 let skipInitializeContracts = false;
 
@@ -65,9 +65,9 @@ const setupContractTesting = async (owner) => {
     let MiniCoin;
     if (network.name === 'hardhat') {
         MiniCoin = await upgrades.deployProxy(FactoryMiniCoin, [owner.address, NAME, SYMBOL, TOTALSUPPLY], {
-            initializer: 'initialize',
+            initializer: 'initialize'
         });
-        
+
         await MiniCoin.deployed();
     } else {
         const MiniCoinAddress = await addressBook.retrieveContract('UpgradeableMiniCoin', network.name);
@@ -134,14 +134,8 @@ const waitForNumberOfBlock = async (provider, numberOfBlock) => {
     }
 };
 
-const executePermitFlow = async (
-    provider, MiniCoin, owner, spender, submitter, amountToPermit
-) => {
-
-    const [blockNumber, nonce] = await Promise.all([
-        provider.getBlockNumber(),
-        MiniCoin.nonces(owner.address)
-    ]);
+const executePermitFlow = async (provider, MiniCoin, owner, spender, submitter, amountToPermit) => {
+    const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
 
     const block = await provider.getBlock(blockNumber);
     const expirationTimestamp = block.timestamp + 20000;
@@ -170,7 +164,6 @@ const executePermitFlow = async (
     );
 
     await submitTxnAndCheckResult(input, MiniCoin.address, submitter, ethers, provider, 0);
-
 };
 
 module.exports = {

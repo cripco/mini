@@ -9,4 +9,3 @@ module.exports = {
     MINICOIN_AMOUNT_GREATER_THAN_ZERO: 'MiniCoin: Amount must be greater than 0',
     OVERFLOW_FAULT_CODE: 'overflow'
 };
-

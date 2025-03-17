@@ -1,6 +1,6 @@
 const { ethers, network } = require('hardhat');
 
-module.exports = {   
+module.exports = {
     signReserve: async function (
         domain,
         chainId,
@@ -18,13 +18,29 @@ module.exports = {
 
         // Construct the hash (same as in Solidity)
         const types = [
-            'uint8', 'uint256', 'address', 'address', 'address', 'address',
-            'uint256', 'uint256', 'uint256', 'uint256'
+            'uint8',
+            'uint256',
+            'address',
+            'address',
+            'address',
+            'address',
+            'uint256',
+            'uint256',
+            'uint256',
+            'uint256'
         ];
 
         const values = [
-            domain, chainId, contractAddress, sourceAddress, targetAddress, executorAddress,
-            amount, fee, nonce, expiryBlockNum
+            domain,
+            chainId,
+            contractAddress,
+            sourceAddress,
+            targetAddress,
+            executorAddress,
+            amount,
+            fee,
+            nonce,
+            expiryBlockNum
         ];
 
         const hash = ethers.utils.solidityKeccak256(types, values);
