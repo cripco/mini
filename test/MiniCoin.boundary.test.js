@@ -974,7 +974,7 @@ describe('MiniCoin - Boundary', function () {
             expect(msg).to.equal(ErrorMessages.OVERFLOW_FAULT_CODE);
         });
     });
-   
+
     describe('Test empty string on different fn()', () => {
         const emptyString = '';
         it('Test burn() w/ empty string', async () => {

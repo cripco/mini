@@ -27,7 +27,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
             address(this),
             'mini',
             'mini',
-            10 * 10 ** 24
+            10 * 10**24
         );
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
             address(miniCoin), // Implementation contract address

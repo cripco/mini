@@ -27,7 +27,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
             address(this),
             'mini',
             'mini',
-            10 * 10 ** 24
+            10 * 10**24
         );
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
             address(miniCoin), // Implementation contract address
@@ -81,10 +81,26 @@ contract MiniCoinTest is DSTest, SharedHelper {
         uint256 deadline = block.number + 100;
         miniCoin.transfer(USER1, amountToTransfer);
 
-        eip712_transfer_verified(USER1, USER1_PRIVATEKEY, amountToTransfer, miniCoin.nonces(USER1), USER3, USER2, deadline);
+        eip712_transfer_verified(
+            USER1,
+            USER1_PRIVATEKEY,
+            amountToTransfer,
+            miniCoin.nonces(USER1),
+            USER3,
+            USER2,
+            deadline
+        );
 
         uint256 newAmountToTransfer = 2;
         miniCoin.transfer(USER1, newAmountToTransfer);
-        eip712_transfer_verified(USER1, USER1_PRIVATEKEY, newAmountToTransfer, miniCoin.nonces(USER1), USER3, USER2, deadline);
+        eip712_transfer_verified(
+            USER1,
+            USER1_PRIVATEKEY,
+            newAmountToTransfer,
+            miniCoin.nonces(USER1),
+            USER3,
+            USER2,
+            deadline
+        );
     }
 }

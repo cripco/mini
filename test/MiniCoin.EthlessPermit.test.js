@@ -60,10 +60,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
 
         it('Test Ethless Permit can override approve', async () => {
             const amountToApprove = amountToPermit - 3;
-            const input0 = await MiniCoin.populateTransaction.approve(
-                user2.address,
-                amountToApprove               
-            );
+            const input0 = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
             await TestHelper.submitTxnAndCheckResult(input0, MiniCoin.address, owner, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToApprove.toString()
@@ -99,7 +96,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
             );
         });
 
-        it('Test Ethless Permit can be overridden by approve', async () => {       
+        it('Test Ethless Permit can be overridden by approve', async () => {
             const blockNumber = await provider.getBlockNumber();
             const block = await provider.getBlock(blockNumber);
             const expirationTimestamp = block.timestamp + 20000;
@@ -130,10 +127,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
             );
 
             const amountToApprove = amountToPermit - 9;
-            const input0 = await MiniCoin.populateTransaction.approve(
-                user2.address,
-                amountToApprove               
-            );
+            const input0 = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
             await TestHelper.submitTxnAndCheckResult(input0, MiniCoin.address, owner, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToApprove.toString()

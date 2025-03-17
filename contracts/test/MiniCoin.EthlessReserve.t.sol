@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol';
 
 import './utils/console.sol';
 import './utils/stdlib.sol';
@@ -21,8 +21,14 @@ contract MiniCoinTest is DSTest, SharedHelper {
         // Deploy contracts
         miniCoin = new MiniCoin();
 
-         // Deploy TransparentUpgradeableProxy
-        bytes memory data = abi.encodeWithSignature('initialize(address,string,string,uint256)', address(this), "mini", "mini", 10 * 10 ** 24);
+        // Deploy TransparentUpgradeableProxy
+        bytes memory data = abi.encodeWithSignature(
+            'initialize(address,string,string,uint256)',
+            address(this),
+            'mini',
+            'mini',
+            10 * 10**24
+        );
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
             address(miniCoin), // Implementation contract address
             address(this), // Admin address (for upgrade control)

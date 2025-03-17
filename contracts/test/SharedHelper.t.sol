@@ -16,7 +16,7 @@ contract SharedHelper is DSTest {
     string constant NAME = 'mini';
     string constant SYMBOL = 'mini';
 
-    uint256 constant TOTALSUPPLY = 300_000_000 * 10 ** 18;
+    uint256 constant TOTALSUPPLY = 300_000_000 * 10**18;
 
     uint256 USER1_PRIVATEKEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     uint256 USER2_PRIVATEKEY = 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d;
@@ -43,7 +43,11 @@ contract SharedHelper is DSTest {
     }
 
     // Events
-    function initialize_helper(uint8 LOG_LEVEL_, address miniCoin_, address testContractAddress_) internal {
+    function initialize_helper(
+        uint8 LOG_LEVEL_,
+        address miniCoin_,
+        address testContractAddress_
+    ) internal {
         _LOG_LEVEL = LOG_LEVEL_;
         _miniCoin = miniCoin_;
         _testContractAddress = testContractAddress_;
@@ -57,10 +61,16 @@ contract SharedHelper is DSTest {
         return keccak256(abi.encodePacked('\x19Ethereum Signed Message:\n32', hash_));
     }
 
-    function signHash(uint256 signerPrivateKey_, bytes32 hash_) internal returns (uint8, bytes32, bytes32) {
+    function signHash(uint256 signerPrivateKey_, bytes32 hash_)
+        internal
+        returns (
+            uint8,
+            bytes32,
+            bytes32
+        )
+    {
         return vm.sign(signerPrivateKey_, addEthSignedMessageHash(hash_));
     }
-   
 
     function eip191_sign_reserve(
         address signer_,
@@ -98,7 +108,14 @@ contract SharedHelper is DSTest {
         uint256 nonce_,
         address spender_,
         uint256 deadline_
-    ) internal returns (uint8 signV, bytes32 signR, bytes32 signS) {
+    )
+        internal
+        returns (
+            uint8 signV,
+            bytes32 signR,
+            bytes32 signS
+        )
+    {
         return
             vm.sign(
                 signerPrivateKey_,
@@ -130,7 +147,14 @@ contract SharedHelper is DSTest {
         uint256 amount_,
         uint256 nonce_,
         uint256 deadline_
-    ) internal returns (uint8 signV, bytes32 signR, bytes32 signS) {
+    )
+        internal
+        returns (
+            uint8 signV,
+            bytes32 signR,
+            bytes32 signS
+        )
+    {
         return
             vm.sign(
                 senderPrivateKey_,
@@ -235,8 +259,7 @@ contract SharedHelper is DSTest {
         );
 
         vm.prank(sender_);
-        if (bytes(revertMsg).length > 0)
-        {
+        if (bytes(revertMsg).length > 0) {
             vm.expectRevert(bytes(revertMsg));
         }
         MiniCoin(_miniCoin).transfer(signer_, recipient_, amountToTransfer_, deadline_, signV, signR, signS);
@@ -306,7 +329,7 @@ contract SharedHelper is DSTest {
         uint256 orginalAmount = MiniCoin(_miniCoin).balanceOf(recipient_);
         uint256 orginalAmountSigner = MiniCoin(_miniCoin).balanceOf(signer_);
 
-        eip712_transfer(signer_, signerPrivateKey_, amountToTransfer_, nonce_, recipient_, sender_, deadline_, "");
+        eip712_transfer(signer_, signerPrivateKey_, amountToTransfer_, nonce_, recipient_, sender_, deadline_, '');
         assertEq(MiniCoin(_miniCoin).balanceOf(signer_), orginalAmountSigner - amountToTransfer_);
         assertEq(MiniCoin(_miniCoin).balanceOf(recipient_), orginalAmount + amountToTransfer_);
     }

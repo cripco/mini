@@ -28,7 +28,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
             address(this),
             'mini',
             'mini',
-            10 * 10 ** 24
+            10 * 10**24
         );
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
             address(miniCoin), // Implementation contract address
@@ -43,7 +43,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
 
     // Complex scenario
     function test_MiniCoin_multiTxn_transferAndBurn_sameBlock() public {
-        uint256 AMOUNT_TO_TRANSFER = 100 * 10 ** 18;
+        uint256 AMOUNT_TO_TRANSFER = 100 * 10**18;
         if (LOG_LEVEL > 0) _changeLogLevel(LOG_LEVEL);
         miniCoin.transfer(USER1, AMOUNT_TO_TRANSFER);
 
@@ -56,7 +56,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
     }
 
     function test_MiniCoin_multiTxn_permitAndTransferFrom_sameBlock() public {
-        uint256 AMOUNT_TO_TRANSFER = 100 * 10 ** 18;
+        uint256 AMOUNT_TO_TRANSFER = 100 * 10**18;
 
         miniCoin.transfer(USER1, AMOUNT_TO_TRANSFER);
 
@@ -80,8 +80,8 @@ contract MiniCoinTest is DSTest, SharedHelper {
     }
 
     function test_MiniCoin_multiTxn_allEthless_sameNonce_sameBlock() public {
-        uint256 AMOUNT_TO_TRANSFER = 100 * 10 ** 18;
-        uint256 AMOUNT_TO_RESERVE = 40 * 10 ** 18;
+        uint256 AMOUNT_TO_TRANSFER = 100 * 10**18;
+        uint256 AMOUNT_TO_RESERVE = 40 * 10**18;
         uint256 deadline = block.number + 100;
         uint256 feeToPay = 100;
         uint256 nonce = 54645;
