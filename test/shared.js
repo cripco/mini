@@ -1,7 +1,8 @@
 require('dotenv').config({ path: __dirname + '/.env.development' });
-const { ethers, network, addressBook } = require('hardhat');
+const { ethers, network, addressBook, upgrades } = require('hardhat');
 const { expect, use } = require('chai');
 const { solidity } = require('ethereum-waffle');
+const SignHelper = require('./signature');
 use(solidity);
 
 const NAME = 'mini';
@@ -12,11 +13,16 @@ const VERSION = '1.0';
 const VERSION_712 = '1.0';
 
 const STANDARD_MINT_AMOUNT = ethers.utils.parseEther('1000');
+const ETHLESS_TRANSFER_SIGNATURE = 'transfer(address,address,uint256,uint256,uint8,bytes32,bytes32)';
 
 let skipInitializeContracts = false;
 
 // LogLevel 0: No logs, 1: Recap of expected rewards, 2: full by block expected rewards math
 if (process.env.LOGLEVEL == undefined) process.env.LOGLEVEL = 0;
+
+const getRandomIntInRange = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 const setupProviderAndWallet = async () => {
     let provider;
@@ -58,9 +64,11 @@ const setupContractTesting = async (owner) => {
     const FactoryMiniCoin = await ethers.getContractFactory('MiniCoin');
     let MiniCoin;
     if (network.name === 'hardhat') {
-        MiniCoin = await FactoryMiniCoin.deploy();
+        MiniCoin = await upgrades.deployProxy(FactoryMiniCoin, [owner.address, NAME, SYMBOL, TOTALSUPPLY], {
+            initializer: 'initialize'
+        });
 
-        await MiniCoin.initialize(owner.address, NAME, SYMBOL, TOTALSUPPLY);
+        await MiniCoin.deployed();
     } else {
         const MiniCoinAddress = await addressBook.retrieveContract('UpgradeableMiniCoin', network.name);
 
@@ -92,7 +100,7 @@ const txn = async (input, to, sender, ethers, provider) => {
     return await provider.waitForTransaction(hash);
 };
 
-const checkResult = async (input, to, from, ethers, provider, errMsg) => {
+const submitTxnAndCheckResult = async (input, to, from, ethers, provider, errMsg) => {
     if (network.name === 'hardhat') {
         if (errMsg) {
             await expect(txn(input, to, from, ethers, provider)).to.be.revertedWith(errMsg);
@@ -126,6 +134,38 @@ const waitForNumberOfBlock = async (provider, numberOfBlock) => {
     }
 };
 
+const executePermitFlow = async (provider, MiniCoin, owner, spender, submitter, amountToPermit) => {
+    const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
+
+    const block = await provider.getBlock(blockNumber);
+    const expirationTimestamp = block.timestamp + 20000;
+
+    // Generate signature
+    const splitSignature = await SignHelper.signPermit(
+        NAME,
+        VERSION_712,
+        MiniCoin.address,
+        owner,
+        spender.address,
+        amountToPermit,
+        nonce.toNumber(),
+        expirationTimestamp
+    );
+
+    // Prepare the transaction input
+    const input = await MiniCoin.populateTransaction.permit(
+        owner.address,
+        spender.address,
+        amountToPermit,
+        expirationTimestamp,
+        splitSignature.v,
+        splitSignature.r,
+        splitSignature.s
+    );
+
+    await submitTxnAndCheckResult(input, MiniCoin.address, submitter, ethers, provider, 0);
+};
+
 module.exports = {
     // CONSTANTS
     NAME,
@@ -135,10 +175,13 @@ module.exports = {
     VERSION,
     VERSION_712,
     STANDARD_MINT_AMOUNT,
+    ETHLESS_TRANSFER_SIGNATURE,
     // FUNCTIONS
     setupProviderAndWallet,
     setupContractTesting,
     txn,
-    checkResult,
-    waitForNumberOfBlock
+    submitTxnAndCheckResult,
+    waitForNumberOfBlock,
+    executePermitFlow,
+    getRandomIntInRange
 };

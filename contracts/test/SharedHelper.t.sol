@@ -51,10 +51,6 @@ contract SharedHelper is DSTest {
         _LOG_LEVEL = LOG_LEVEL_;
         _miniCoin = miniCoin_;
         _testContractAddress = testContractAddress_;
-
-        // Initialize contracts
-
-        MiniCoin(miniCoin_).initialize(testContractAddress_, NAME, SYMBOL, TOTALSUPPLY);
     }
 
     function _changeLogLevel(uint8 newLogLevel_) internal {
@@ -74,57 +70,6 @@ contract SharedHelper is DSTest {
         )
     {
         return vm.sign(signerPrivateKey_, addEthSignedMessageHash(hash_));
-    }
-
-    function eip191_sign_burn(
-        address signer_,
-        uint256 signerPrivateKey_,
-        uint256 amountToBurn_,
-        uint256 feeToPay_,
-        uint256 nonce_
-    ) internal returns (bytes memory signature) {
-        (uint8 signV, bytes32 signR, bytes32 signS) = signHash(
-            signerPrivateKey_,
-            keccak256(
-                abi.encodePacked(
-                    EthlessTxnType.BURN,
-                    block.chainid,
-                    _miniCoin,
-                    signer_,
-                    amountToBurn_,
-                    feeToPay_,
-                    nonce_
-                )
-            )
-        );
-        return abi.encodePacked(signR, signS, signV);
-    }
-
-    function eip191_sign_transfer(
-        address signer_,
-        uint256 signerPrivateKey_,
-        uint256 amountToTransfer_,
-        uint256 feeToPay_,
-        uint256 nonce_,
-        address receiver_
-    ) internal returns (bytes memory signature) {
-        (uint8 signV, bytes32 signR, bytes32 signS) = signHash(
-            signerPrivateKey_,
-            keccak256(
-                abi.encodePacked(
-                    EthlessTxnType.TRANSFER,
-                    block.chainid,
-                    _miniCoin,
-                    signer_,
-                    receiver_,
-                    amountToTransfer_,
-                    feeToPay_,
-                    nonce_
-                )
-            )
-        );
-
-        return abi.encodePacked(signR, signS, signV);
     }
 
     function eip191_sign_reserve(
@@ -195,46 +140,43 @@ contract SharedHelper is DSTest {
             );
     }
 
-    function eip191_burn(
-        address signer_,
-        uint256 signerPrivateKey_,
-        uint256 amountToBurn_,
-        uint256 feeToPay_,
-        uint256 nonce_,
+    function eip712_sign_transfer(
         address sender_,
-        bool giveTokens_
-    ) internal {
-        if (giveTokens_) MiniCoin(_miniCoin).transfer(signer_, amountToBurn_);
-
-        bytes memory signature = eip191_sign_burn(signer_, signerPrivateKey_, amountToBurn_, feeToPay_, nonce_);
-
-        vm.prank(sender_);
-        MiniCoin(_miniCoin).burn(signer_, amountToBurn_, feeToPay_, nonce_, signature);
-    }
-
-    function eip191_transfer(
-        address signer_,
-        uint256 signerPrivateKey_,
-        uint256 amountToTransfer_,
-        uint256 feeToPay_,
+        uint256 senderPrivateKey_,
+        address recipient_,
+        uint256 amount_,
         uint256 nonce_,
-        address receiver_,
-        address sender_,
-        bool giveTokens_
-    ) internal {
-        if (giveTokens_) MiniCoin(_miniCoin).transfer(signer_, amountToTransfer_ + feeToPay_);
-
-        bytes memory signature = eip191_sign_transfer(
-            signer_,
-            signerPrivateKey_,
-            amountToTransfer_,
-            feeToPay_,
-            nonce_,
-            receiver_
-        );
-
-        vm.prank(sender_);
-        MiniCoin(_miniCoin).transfer(signer_, receiver_, amountToTransfer_, feeToPay_, nonce_, signature);
+        uint256 deadline_
+    )
+        internal
+        returns (
+            uint8 signV,
+            bytes32 signR,
+            bytes32 signS
+        )
+    {
+        return
+            vm.sign(
+                senderPrivateKey_,
+                keccak256(
+                    abi.encodePacked(
+                        '\x19\x01',
+                        MiniCoin(_miniCoin).DOMAIN_SEPARATOR(),
+                        keccak256(
+                            abi.encode(
+                                keccak256(
+                                    'Transfer(address sender,address recipient,uint256 amount,uint256 nonce,uint256 deadline)'
+                                ),
+                                sender_,
+                                recipient_,
+                                amount_,
+                                nonce_,
+                                deadline_
+                            )
+                        )
+                    )
+                )
+            );
     }
 
     function eip191_reserve(
@@ -297,66 +239,30 @@ contract SharedHelper is DSTest {
         MiniCoin(_miniCoin).permit(signer_, spender_, amountToPermit_, deadline_, signV, signR, signS);
     }
 
-    function eip191_burn_verified(
-        address signer_,
-        uint256 signerPrivateKey_,
-        uint256 amountToBurn_,
-        uint256 feeToPay_,
-        uint256 nonce_,
-        address sender_,
-        bool giveTokens_
-    ) internal {
-        uint256 original_signerBalance = MiniCoin(_miniCoin).balanceOf(signer_);
-        uint256 original_senderBalance = MiniCoin(_miniCoin).balanceOf(sender_);
-
-        eip191_burn(signer_, signerPrivateKey_, amountToBurn_, feeToPay_, nonce_, sender_, giveTokens_);
-
-        if (_LOG_LEVEL > 0) {
-            console.log('Signer balance: ', MiniCoin(_miniCoin).balanceOf(signer_));
-            console.log('Sender balance: ', MiniCoin(_miniCoin).balanceOf(sender_));
-        }
-        if (original_signerBalance > amountToBurn_)
-            assertEq(MiniCoin(_miniCoin).balanceOf(signer_), original_signerBalance - amountToBurn_);
-        else assertEq(MiniCoin(_miniCoin).balanceOf(signer_), 0);
-        assertEq(MiniCoin(_miniCoin).balanceOf(sender_), original_senderBalance + feeToPay_);
-        assertEq(MiniCoin(_miniCoin).totalSupply(), TOTALSUPPLY - (amountToBurn_ - feeToPay_));
-    }
-
-    function eip191_transfer_verified(
+    function eip712_transfer(
         address signer_,
         uint256 signerPrivateKey_,
         uint256 amountToTransfer_,
-        uint256 feeToPay_,
         uint256 nonce_,
-        address receiver_,
+        address recipient_,
         address sender_,
-        bool giveTokens_
+        uint256 deadline_,
+        string memory revertMsg
     ) internal {
-        uint256 original_signerBalance = MiniCoin(_miniCoin).balanceOf(signer_);
-        uint256 original_senderBalance = MiniCoin(_miniCoin).balanceOf(sender_);
-        uint256 original_receiverBalance = MiniCoin(_miniCoin).balanceOf(receiver_);
-
-        eip191_transfer(
+        (uint8 signV, bytes32 signR, bytes32 signS) = eip712_sign_transfer(
             signer_,
             signerPrivateKey_,
+            recipient_,
             amountToTransfer_,
-            feeToPay_,
             nonce_,
-            receiver_,
-            sender_,
-            giveTokens_
+            deadline_
         );
 
-        if (_LOG_LEVEL > 0) {
-            console.log('Signer balance: ', MiniCoin(_miniCoin).balanceOf(signer_));
-            console.log('Sender balance: ', MiniCoin(_miniCoin).balanceOf(sender_));
-            console.log('Receiver balance: ', MiniCoin(_miniCoin).balanceOf(receiver_));
+        vm.prank(sender_);
+        if (bytes(revertMsg).length > 0) {
+            vm.expectRevert(bytes(revertMsg));
         }
-        if (original_signerBalance > (amountToTransfer_ + feeToPay_))
-            assertEq(MiniCoin(_miniCoin).balanceOf(signer_), original_signerBalance - (amountToTransfer_ + feeToPay_));
-        else assertEq(MiniCoin(_miniCoin).balanceOf(signer_), 0);
-        assertEq(MiniCoin(_miniCoin).balanceOf(sender_), original_senderBalance + feeToPay_);
-        assertEq(MiniCoin(_miniCoin).balanceOf(receiver_), original_receiverBalance + amountToTransfer_);
+        MiniCoin(_miniCoin).transfer(signer_, recipient_, amountToTransfer_, deadline_, signV, signR, signS);
     }
 
     function eip191_reserve_verified(
@@ -409,5 +315,22 @@ contract SharedHelper is DSTest {
         eip712_permit(signer_, signerPrivateKey_, amountToPermit_, nonce_, spender_, sender_, deadline_);
 
         assertEq(MiniCoin(_miniCoin).allowance(signer_, spender_), amountToPermit_);
+    }
+
+    function eip712_transfer_verified(
+        address signer_,
+        uint256 signerPrivateKey_,
+        uint256 amountToTransfer_,
+        uint256 nonce_,
+        address recipient_,
+        address sender_,
+        uint256 deadline_
+    ) internal {
+        uint256 orginalAmount = MiniCoin(_miniCoin).balanceOf(recipient_);
+        uint256 orginalAmountSigner = MiniCoin(_miniCoin).balanceOf(signer_);
+
+        eip712_transfer(signer_, signerPrivateKey_, amountToTransfer_, nonce_, recipient_, sender_, deadline_, '');
+        assertEq(MiniCoin(_miniCoin).balanceOf(signer_), orginalAmountSigner - amountToTransfer_);
+        assertEq(MiniCoin(_miniCoin).balanceOf(recipient_), orginalAmount + amountToTransfer_);
     }
 }

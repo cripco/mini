@@ -5,17 +5,21 @@ pragma solidity ^0.8.13;
  * @title Ethless
  */
 
-import './ERC20Reservable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol';
 
-contract Ethless is ERC20Reservable {
+import './ERC20Reservable.sol';
+
+contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
     using ECDSAUpgradeable for bytes32;
 
+    // keccak256("Transfer(address sender,address recipient,uint256 amount,uint256 nonce,uint256 deadline)")
+    bytes32 private constant _TRANSFER_TYPEHASH = 0xa43cfdcd630933b29083d1c5116d122bcc478eab04dd62c15dd45c3bdc58ce85;
+
     enum EthlessTxnType {
-        NONE, // 0
-        BURN, // 1
-        MINT, // 2
-        TRANSFER, // 3
+        NONE, // 0, Placeholder for legacy type
+        BURN, // 1, Placeholder for legacy type
+        MINT, // 2, Placeholder for legacy type
+        TRANSFER, // 3, Placeholder for legacy type
         RESERVE // 4
     }
 
@@ -43,42 +47,26 @@ contract Ethless is ERC20Reservable {
     }
 
     function transfer(
-        address signer_,
-        address to_,
-        uint256 amount_,
-        uint256 fee_,
-        uint256 nonce_,
-        bytes calldata signature_
-    ) external returns (bool succcess) {
-        _useNonce(signer_, nonce_, EthlessTxnType.TRANSFER);
+        address sender,
+        address recipient,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external virtual {
+        require(block.timestamp <= deadline, 'Ethless: expired deadline');
 
         bytes32 structHash = keccak256(
-            abi.encodePacked(EthlessTxnType.TRANSFER, block.chainid, address(this), signer_, to_, amount_, fee_, nonce_)
+            abi.encode(_TRANSFER_TYPEHASH, sender, recipient, amount, _useNonce(sender), deadline)
         );
-        _validateEthlessHash(signer_, structHash, signature_);
 
-        if (fee_ > 0) _transfer(signer_, _msgSender(), fee_);
-        _transfer(signer_, to_, amount_);
-        return true;
-    }
+        bytes32 hash = _hashTypedDataV4(structHash);
 
-    function burn(
-        address signer_,
-        uint256 amount_,
-        uint256 fee_,
-        uint256 nonce_,
-        bytes calldata signature_
-    ) external returns (bool succcess) {
-        _useNonce(signer_, nonce_, EthlessTxnType.BURN);
+        address signer = ECDSAUpgradeable.recover(hash, v, r, s);
+        require(signer == sender, 'Ethless: invalid signature');
 
-        bytes32 structHash = keccak256(
-            abi.encodePacked(EthlessTxnType.BURN, block.chainid, address(this), signer_, amount_, fee_, nonce_)
-        );
-        _validateEthlessHash(signer_, structHash, signature_);
-
-        if (fee_ > 0) _transfer(signer_, _msgSender(), fee_);
-        _burn(signer_, amount_ - fee_);
-        return true;
+        _transfer(signer, recipient, amount);
     }
 
     function reserve(
@@ -113,8 +101,14 @@ contract Ethless is ERC20Reservable {
         return true;
     }
 
-    function balanceOf(address account) public view virtual override returns (uint256 amount) {
-        return super.balanceOf(account);
+    function balanceOf(address account)
+        public
+        view
+        virtual
+        override(ERC20Upgradeable, ERC20Reservable)
+        returns (uint256 amount)
+    {
+        return ERC20Reservable.balanceOf(account);
     }
 
     uint256[50] private __gap;

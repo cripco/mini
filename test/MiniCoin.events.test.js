@@ -79,7 +79,7 @@ describe('MiniCoin - Events emission', function () {
                 user2.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
 
             const input = await MiniCoin.connect(user2)['transferFrom(address,address,uint256)'](
                 owner.address,

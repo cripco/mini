@@ -43,7 +43,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 nonce.toNumber(),
                 expirationTimestamp
             );
-            const input = await MiniCoin.connect(user1).populateTransaction.permit(
+            const input = await MiniCoin.populateTransaction.permit(
                 owner.address,
                 user2.address,
                 amountToPermit,
@@ -52,9 +52,85 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 splitSignature.r,
                 splitSignature.s
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToPermit.toString()
+            );
+        });
+
+        it('Test Ethless Permit can override approve', async () => {
+            const amountToApprove = amountToPermit - 3;
+            const input0 = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
+            await TestHelper.submitTxnAndCheckResult(input0, MiniCoin.address, owner, ethers, provider, 0);
+            expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
+                amountToApprove.toString()
+            );
+
+            const blockNumber = await provider.getBlockNumber();
+            const block = await provider.getBlock(blockNumber);
+            const expirationTimestamp = block.timestamp + 20000;
+            const nonce = await MiniCoin.nonces(owner.address);
+
+            const splitSignature = await SignHelper.signPermit(
+                TestHelper.NAME,
+                TestHelper.VERSION_712,
+                MiniCoin.address,
+                owner,
+                user2.address,
+                amountToPermit,
+                nonce.toNumber(),
+                expirationTimestamp
+            );
+            const input = await MiniCoin.populateTransaction.permit(
+                owner.address,
+                user2.address,
+                amountToPermit,
+                expirationTimestamp,
+                splitSignature.v,
+                splitSignature.r,
+                splitSignature.s
+            );
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
+                amountToPermit.toString()
+            );
+        });
+
+        it('Test Ethless Permit can be overridden by approve', async () => {
+            const blockNumber = await provider.getBlockNumber();
+            const block = await provider.getBlock(blockNumber);
+            const expirationTimestamp = block.timestamp + 20000;
+            const nonce = await MiniCoin.nonces(owner.address);
+
+            const splitSignature = await SignHelper.signPermit(
+                TestHelper.NAME,
+                TestHelper.VERSION_712,
+                MiniCoin.address,
+                owner,
+                user2.address,
+                amountToPermit,
+                nonce.toNumber(),
+                expirationTimestamp
+            );
+            const input = await MiniCoin.populateTransaction.permit(
+                owner.address,
+                user2.address,
+                amountToPermit,
+                expirationTimestamp,
+                splitSignature.v,
+                splitSignature.r,
+                splitSignature.s
+            );
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
+                amountToPermit.toString()
+            );
+
+            const amountToApprove = amountToPermit - 9;
+            const input0 = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
+            await TestHelper.submitTxnAndCheckResult(input0, MiniCoin.address, owner, ethers, provider, 0);
+            expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
+                amountToApprove.toString()
             );
         });
 
@@ -74,7 +150,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 nonce.toNumber(),
                 expirationTimestamp
             );
-            const input = await MiniCoin.connect(user1).populateTransaction.permit(
+            const input = await MiniCoin.populateTransaction.permit(
                 owner.address,
                 user2.address,
                 amountToPermit,
@@ -83,7 +159,8 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 splitSignature.r,
                 splitSignature.s
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToPermit.toString()
             );
@@ -96,7 +173,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 user1.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransferFrom, MiniCoin.address, user2, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransferFrom, MiniCoin.address, user2, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalOwnerBalance).sub(amountToTransfer)
@@ -158,7 +235,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 }
             );
             const splitSignature = ethers.utils.splitSignature(signature);
-            const input = await MiniCoin.connect(user1).populateTransaction.permit(
+            const input = await MiniCoin.populateTransaction.permit(
                 owner.address,
                 user2.address,
                 amountToPermit,
@@ -167,11 +244,11 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 splitSignature.r,
                 splitSignature.s
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToPermit.toString()
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 input,
                 MiniCoin.address,
                 user3,
@@ -228,7 +305,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 }
             );
             const splitSignature = ethers.utils.splitSignature(signature);
-            const input = await MiniCoin.connect(user1).populateTransaction.permit(
+            const input = await MiniCoin.populateTransaction.permit(
                 owner.address,
                 user2.address,
                 amountToPermit,
@@ -237,7 +314,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 splitSignature.r,
                 splitSignature.s
             );
-            await TestHelper.checkResult(input, MiniCoin.address, user3, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, 0);
             expect((await MiniCoin.allowance(owner.address, user2.address)).toString()).to.equal(
                 amountToPermit.toString()
             );
@@ -250,7 +327,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 user1.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransferFrom, MiniCoin.address, user2, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransferFrom, MiniCoin.address, user2, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalOwnerBalance).sub(amountToTransfer)
@@ -264,7 +341,7 @@ describe('MiniCoin - Ethless Permit functions', function () {
                 user1.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransferFrom2,
                 MiniCoin.address,
                 user2,

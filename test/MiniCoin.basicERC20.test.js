@@ -48,47 +48,55 @@ describe('MiniCoin - Basic ERC20 functions', function () {
 
         beforeEach(async () => {
             const amountToTransfer = 100;
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
+            const inputTransfer = await MiniCoin.populateTransaction['transfer(address,uint256)'](
                 user1.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
         });
         it('Test approve()', async () => {
-            const inputApprove = await MiniCoin.connect(user1).populateTransaction.approve(
-                user2.address,
-                amountToApprove
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal(
                 amountToApprove.toString()
             );
         });
         it('Test increaseAllowance()', async () => {
-            const inputIncreaseAllowance = await MiniCoin.connect(user1).populateTransaction.increaseAllowance(
+            const inputIncreaseAllowance = await MiniCoin.populateTransaction.increaseAllowance(
                 user2.address,
                 amountToIncrease
             );
-            await TestHelper.checkResult(inputIncreaseAllowance, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(
+                inputIncreaseAllowance,
+                MiniCoin.address,
+                user1,
+                ethers,
+                provider,
+                0
+            );
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal(
                 amountToIncrease.toString()
             );
         });
         it('Test decreaseAllowance()', async () => {
-            const inputApprove = await MiniCoin.connect(user1).populateTransaction.approve(
-                user2.address,
-                amountToApprove
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal(
                 amountToApprove.toString()
             );
 
-            const inputDecreaseAllowance = await MiniCoin.connect(user1).populateTransaction.decreaseAllowance(
+            const inputDecreaseAllowance = await MiniCoin.populateTransaction.decreaseAllowance(
                 user2.address,
                 amountToDecrease
             );
-            await TestHelper.checkResult(inputDecreaseAllowance, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(
+                inputDecreaseAllowance,
+                MiniCoin.address,
+                user1,
+                ethers,
+                provider,
+                0
+            );
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal((50).toString());
         });
     });
@@ -99,11 +107,11 @@ describe('MiniCoin - Basic ERC20 functions', function () {
         it('Test transfer() / verify balanceOf owner is -1000', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
+            const inputTransfer = await MiniCoin.populateTransaction['transfer(address,uint256)'](
                 user2.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToTransfer)
@@ -114,18 +122,15 @@ describe('MiniCoin - Basic ERC20 functions', function () {
             const originalOwnerBalance = await MiniCoin.balanceOf(owner.address);
             const originalUser2Balance = await MiniCoin.balanceOf(user2.address);
 
-            const inputApprove = await MiniCoin.connect(owner).populateTransaction.approve(
-                user1.address,
-                amountToTransfer
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user1.address, amountToTransfer);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
 
-            const inputTransferFrom = await MiniCoin.connect(user1).populateTransaction.transferFrom(
+            const inputTransferFrom = await MiniCoin.populateTransaction.transferFrom(
                 owner.address,
                 user2.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransferFrom, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransferFrom, MiniCoin.address, user1, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalOwnerBalance).sub(amountToTransfer)
@@ -142,8 +147,8 @@ describe('MiniCoin - Basic ERC20 functions', function () {
         it('Test burn() / verify balanceOf owner is -100', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['burn(uint256)'](amountToBurn);
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            const inputTransfer = await MiniCoin.populateTransaction['burn(uint256)'](amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalBalance).sub(amountToBurn)
@@ -157,27 +162,24 @@ describe('MiniCoin - Basic ERC20 functions', function () {
 
         beforeEach(async () => {
             const amountToTransfer = 100;
-            const inputTransfer = await MiniCoin.connect(owner).populateTransaction['transfer(address,uint256)'](
+            const inputTransfer = await MiniCoin.populateTransaction['transfer(address,uint256)'](
                 user1.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
         });
         it('Test decreaseAllowance() by more than the current allowance', async () => {
-            const inputApprove = await MiniCoin.connect(user1).populateTransaction.approve(
-                user2.address,
-                amountToApprove
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user2.address, amountToApprove);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
             expect((await MiniCoin.allowance(user1.address, user2.address)).toString()).to.equal(
                 amountToApprove.toString()
             );
 
-            const inputDecreaseAllowance = await MiniCoin.connect(user1).populateTransaction.decreaseAllowance(
+            const inputDecreaseAllowance = await MiniCoin.populateTransaction.decreaseAllowance(
                 user2.address,
                 amountToDecrease
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputDecreaseAllowance,
                 MiniCoin.address,
                 user1,
@@ -194,11 +196,11 @@ describe('MiniCoin - Basic ERC20 functions', function () {
         it('Test transfer() without balance', async () => {
             const originalUser1Balance = await MiniCoin.balanceOf(user1.address);
 
-            const inputTransfer = await MiniCoin.connect(user1).populateTransaction['transfer(address,uint256)'](
+            const inputTransfer = await MiniCoin.populateTransaction['transfer(address,uint256)'](
                 user2.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransfer,
                 MiniCoin.address,
                 user1,
@@ -208,16 +210,17 @@ describe('MiniCoin - Basic ERC20 functions', function () {
             );
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(originalUser1Balance));
         });
+
         it('Test transferFrom() without allowance', async () => {
             const originalUser1Balance = await MiniCoin.balanceOf(user1.address);
             const originalUser3Balance = await MiniCoin.balanceOf(user3.address);
 
-            const inputTransferFrom = await MiniCoin.connect(user2).populateTransaction.transferFrom(
+            const inputTransferFrom = await MiniCoin.populateTransaction.transferFrom(
                 user1.address,
                 user3.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransferFrom,
                 MiniCoin.address,
                 user2,
@@ -232,18 +235,15 @@ describe('MiniCoin - Basic ERC20 functions', function () {
             const originalUser1Balance = await MiniCoin.balanceOf(user1.address);
             const originalUser3Balance = await MiniCoin.balanceOf(user3.address);
 
-            const inputApprove = await MiniCoin.connect(user1).populateTransaction.approve(
-                user2.address,
-                amountToTransfer
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user2.address, amountToTransfer);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, user1, ethers, provider, 0);
 
-            const inputTransferFrom = await MiniCoin.connect(user2).populateTransaction.transferFrom(
+            const inputTransferFrom = await MiniCoin.populateTransaction.transferFrom(
                 user1.address,
                 user3.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransferFrom,
                 MiniCoin.address,
                 user2,
@@ -258,18 +258,15 @@ describe('MiniCoin - Basic ERC20 functions', function () {
             const originalOwnerBalance = await MiniCoin.balanceOf(owner.address);
             const originalUser2Balance = await MiniCoin.balanceOf(user2.address);
 
-            const inputApprove = await MiniCoin.connect(owner).populateTransaction.approve(
-                user1.address,
-                amountToTransfer
-            );
-            await TestHelper.checkResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
+            const inputApprove = await MiniCoin.populateTransaction.approve(user1.address, amountToTransfer);
+            await TestHelper.submitTxnAndCheckResult(inputApprove, MiniCoin.address, owner, ethers, provider, 0);
 
-            const inputTransferFrom = await MiniCoin.connect(user1).populateTransaction.transferFrom(
+            const inputTransferFrom = await MiniCoin.populateTransaction.transferFrom(
                 owner.address,
                 user2.address,
                 amountToTransfer
             );
-            await TestHelper.checkResult(inputTransferFrom, MiniCoin.address, user1, ethers, provider, 0);
+            await TestHelper.submitTxnAndCheckResult(inputTransferFrom, MiniCoin.address, user1, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(
                 ethers.BigNumber.from(originalOwnerBalance).sub(amountToTransfer)
@@ -278,7 +275,7 @@ describe('MiniCoin - Basic ERC20 functions', function () {
                 ethers.BigNumber.from(originalUser2Balance).add(amountToTransfer)
             );
 
-            await TestHelper.checkResult(
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransferFrom,
                 MiniCoin.address,
                 user1,
@@ -295,8 +292,8 @@ describe('MiniCoin - Basic ERC20 functions', function () {
         it('Test burn() without balance', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 
-            const inputTransfer = await MiniCoin.connect(user1).populateTransaction['burn(uint256)'](amountToBurn);
-            await TestHelper.checkResult(
+            const inputTransfer = await MiniCoin.populateTransaction['burn(uint256)'](amountToBurn);
+            await TestHelper.submitTxnAndCheckResult(
                 inputTransfer,
                 MiniCoin.address,
                 user1,

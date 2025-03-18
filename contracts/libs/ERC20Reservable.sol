@@ -24,6 +24,27 @@ contract ERC20Reservable is ERC20Upgradeable {
         ReservationStatus status;
     }
 
+    // Events
+    event Reserved(
+        address indexed from,
+        address indexed to,
+        address indexed executor,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        uint256 deadline
+    );
+
+    event Executed(
+        address indexed from,
+        address indexed executor,
+        address indexed recipient,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce
+    );
+    event Reclaimed(address indexed from, address indexed executor, uint256 amount, uint256 fee, uint256 nonce);
+
     // Total balance of all active reservations per address
     mapping(address => uint256) private _totalReserved;
 
@@ -52,6 +73,7 @@ contract ERC20Reservable is ERC20Upgradeable {
             ReservationStatus.Active
         );
         _totalReserved[from_] += amount_ + executionFee_;
+        emit Reserved(from_, to_, executor_, amount_, executionFee_, nonce_, deadline_);
     }
 
     function reserveOf(address account_) external view returns (uint256 count) {
@@ -89,6 +111,8 @@ contract ERC20Reservable is ERC20Upgradeable {
 
         _transfer(from_, executor, fee);
         _transfer(from_, recipient, amount);
+
+        emit Executed(from_, executor, recipient, amount, fee, reservation.expiryBlockNum);
     }
 
     function execute(address from_, uint256 nonce_) external returns (bool success) {
@@ -113,7 +137,7 @@ contract ERC20Reservable is ERC20Upgradeable {
             );
             require(
                 reservation.expiryBlockNum <= block.number,
-                'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
+                'ERC20Reservable: reservation has not expired to be reclaimed by non-executor'
             );
         }
 
@@ -122,6 +146,7 @@ contract ERC20Reservable is ERC20Upgradeable {
             _totalReserved[from_] -= reservation.amount + reservation.fee;
         }
 
+        emit Reclaimed(from_, executor, reservation.amount, reservation.fee, nonce_);
         return true;
     }
 
