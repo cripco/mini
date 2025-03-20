@@ -25,6 +25,7 @@ contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
         __EIP712_init_unchained(name_, version());
         __ERC20Permit_init_unchained(name_);
         __Reservable_init_unchained();
+        __Ethless_init_unchained();
         __ERC20Burnable_init_unchained();
         _mint(owner_, totalSupply_);
     }
@@ -51,11 +52,7 @@ contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable) {
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20Upgradeable) {
         super._afterTokenTransfer(from, to, amount);
     }
 
