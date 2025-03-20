@@ -25,6 +25,7 @@ contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
         __EIP712_init_unchained(name_, version());
         __ERC20Permit_init_unchained(name_);
         __Reservable_init_unchained();
+        __Ethless_init_unchained();
         __ERC20Burnable_init_unchained();
         _mint(owner_, totalSupply_);
     }
