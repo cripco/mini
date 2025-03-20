@@ -554,7 +554,7 @@ describe('MiniCoin - Boundary', function () {
                 owner,
                 ethers,
                 provider,
-                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+                0
             );
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
@@ -571,7 +571,7 @@ describe('MiniCoin - Boundary', function () {
                 owner,
                 ethers,
                 provider,
-                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+                0
             );
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
@@ -597,7 +597,7 @@ describe('MiniCoin - Boundary', function () {
                 user1,
                 ethers,
                 provider,
-                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+                0
             );
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
@@ -636,7 +636,7 @@ describe('MiniCoin - Boundary', function () {
                 owner,
                 ethers,
                 provider,
-                ErrorMessages.MINICOIN_AMOUNT_GREATER_THAN_ZERO
+                0
             );
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
