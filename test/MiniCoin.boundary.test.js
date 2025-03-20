@@ -548,14 +548,7 @@ describe('MiniCoin - Boundary', function () {
         const amount = 0;
         it('Test burn() w/ zero(0) number', async () => {
             const inputBurn = await MiniCoin.populateTransaction['burn(uint256)'](amount);
-            msg = await TestHelper.submitTxnAndCheckResult(
-                inputBurn,
-                MiniCoin.address,
-                owner,
-                ethers,
-                provider,
-                0
-            );
+            msg = await TestHelper.submitTxnAndCheckResult(inputBurn, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
 
@@ -565,14 +558,7 @@ describe('MiniCoin - Boundary', function () {
                 amount,
                 { from: owner.address }
             );
-            await TestHelper.submitTxnAndCheckResult(
-                inputTransfer,
-                MiniCoin.address,
-                owner,
-                ethers,
-                provider,
-                0
-            );
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, owner, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user1.address)).to.equal(ethers.BigNumber.from(0));
@@ -591,14 +577,7 @@ describe('MiniCoin - Boundary', function () {
                 user2.address,
                 amount
             );
-            await TestHelper.submitTxnAndCheckResult(
-                inputTransfer,
-                MiniCoin.address,
-                user1,
-                ethers,
-                provider,
-                0
-            );
+            await TestHelper.submitTxnAndCheckResult(inputTransfer, MiniCoin.address, user1, ethers, provider, 0);
 
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
             expect(await MiniCoin.balanceOf(user2.address)).to.equal(ethers.BigNumber.from(0));
@@ -630,14 +609,7 @@ describe('MiniCoin - Boundary', function () {
                 splitSignature.s
             );
 
-            await TestHelper.submitTxnAndCheckResult(
-                input,
-                MiniCoin.address,
-                owner,
-                ethers,
-                provider,
-                0
-            );
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, owner, ethers, provider, 0);
             expect(await MiniCoin.balanceOf(owner.address)).to.equal(ethers.BigNumber.from(originalBalance));
         });
 
