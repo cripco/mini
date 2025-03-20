@@ -151,7 +151,7 @@ contract ERC20Reservable is ERC20Upgradeable {
     }
 
     function balanceOf(address account) public view virtual override returns (uint256 amount) {
-        return super.balanceOf(account) - _totalReserved[account];
+        return ERC20Upgradeable.balanceOf(account) - _totalReserved[account];
     }
 
     uint256[50] private __gap;
