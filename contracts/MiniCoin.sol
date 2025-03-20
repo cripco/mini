@@ -49,7 +49,7 @@ contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
     ) internal virtual override(ERC20Upgradeable) {
         require(amount > 0, 'MiniCoin: Amount must be greater than 0');
         require(from == address(0) || balanceOf(from) >= amount, 'MiniCoin: Insufficient balance');
-        super._beforeTokenTransfer(from, to, amount);
+        ERC20Upgradeable._beforeTokenTransfer(from, to, amount);
     }
 
     function _afterTokenTransfer(
@@ -57,7 +57,7 @@ contract MiniCoin is Ethless, ERC20BurnableUpgradeable {
         address to,
         uint256 amount
     ) internal virtual override(ERC20Upgradeable) {
-        super._afterTokenTransfer(from, to, amount);
+        ERC20Upgradeable._afterTokenTransfer(from, to, amount);
     }
 
     uint256[50] private __gap;
