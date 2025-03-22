@@ -11,43 +11,28 @@ async function main() {
     console.log('\x1b[32m%s\x1b[0m', 'Account balance: ', (await deployer.getBalance()).toString());
 
     // Contract deployed with transparent proxy
-    const UpgradeableMiniCoin = await ethers.getContractFactory('MiniCoin');
-    const upgradeableMiniCoin = await upgrades.deployProxy(UpgradeableMiniCoin, [
+    const MiniCoinContract = await ethers.getContractFactory('MiniCoin');
+    const MiniCoin = await MiniCoinContract.deploy(
         owner,
         TestHelper.NAME,
         TestHelper.SYMBOL,
         TestHelper.TOTALSUPPLY
-    ]);
-    await upgradeableMiniCoin.deployed();
+    );
+    await MiniCoin.deployed();
     addressBook.saveContract(
-        'UpgradeableMiniCoin',
-        upgradeableMiniCoin.address,
+        'MiniCoin',
+        MiniCoin.address,
         network.name,
         deployer.address,
-        upgradeableMiniCoin.blockHash,
-        upgradeableMiniCoin.blockNumber
+        MiniCoin.blockHash,
+        MiniCoin.blockNumber
     );
     console.log(
         '\x1b[32m%s\x1b[0m',
-        'UpgradeableMiniCoin deployed at address: ',
-        upgradeableMiniCoin.address
+        'MiniCoin deployed at address: ',
+        MiniCoin.address
     );
-
-    // Get ProxyAdmin address from .openzeppelin/
-    const ProxyAdmin_Address = await addressBook.retrieveOZAdminProxyContract(network.config.chainId);
-    console.log('Deployed using Proxy Admin contract address: ', ProxyAdmin_Address);
-    addressBook.saveContract('ProxyAdmin', ProxyAdmin_Address, network.name, deployer.address);
-    console.log('\x1b[32m%s\x1b[0m', 'Account balance: ', (await deployer.getBalance()).toString());
-
-    // Get Logic/Implementation address from proxy admin contract
-    const LogicMiniCoin = await ScriptHelper.getImplementation(
-        upgradeableMiniCoin.address,
-        ProxyAdmin_Address,
-        deployer,
-        ethers
-    );
-    console.log('Deployed using Logic/Implementation contract address: ', LogicMiniCoin);
-    addressBook.saveContract('LogicMiniCoin', LogicMiniCoin, network.name, deployer.address);
+  
     console.log('\x1b[32m%s\x1b[0m', 'Account balance: ', (await deployer.getBalance()).toString());
 
     console.log('Contract deployed!');
