@@ -17,10 +17,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
 
     function setUp() public {
         // Deploy contracts
-        miniCoin = new MiniCoin(address(this),
-            'mini',
-            'mini',
-            10 * 10**24);
+        miniCoin = new MiniCoin(address(this), 'mini', 'mini', 10 * 10**24);
 
         initialize_helper(LOG_LEVEL, address(miniCoin), address(this));
         if (LOG_LEVEL > 0) _changeLogLevel(LOG_LEVEL);
