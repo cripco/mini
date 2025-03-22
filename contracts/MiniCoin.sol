@@ -10,7 +10,7 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import './libs/Ethless.sol';
 
 contract MiniCoin is Ethless, ERC20Burnable {
-    /// The contract is intended to be deployed as non-upgrdeable
+    /// The contract is intended to be deployed as non-upgradeable
     constructor(
         address holder_,
         string memory name_,
