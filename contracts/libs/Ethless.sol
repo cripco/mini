@@ -102,6 +102,4 @@ abstract contract Ethless is ERC20Permit, ERC20Reservable {
     function balanceOf(address account) public view virtual override(ERC20, ERC20Reservable) returns (uint256 amount) {
         return ERC20Reservable.balanceOf(account);
     }
-
-    uint256[50] private __gap;
 }
