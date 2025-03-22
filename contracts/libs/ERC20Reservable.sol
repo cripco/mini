@@ -5,9 +5,9 @@ pragma solidity ^0.8.13;
  * @title Reservable
  */
 
-import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
-contract ERC20Reservable is ERC20Upgradeable {
+abstract contract ERC20Reservable is ERC20 {
     enum ReservationStatus {
         Draft, // 0
         Active, // 1
@@ -50,8 +50,6 @@ contract ERC20Reservable is ERC20Upgradeable {
 
     // Mapping of all reservations per address and nonces
     mapping(address => mapping(uint256 => Reservation)) internal _reservation;
-
-    function __Reservable_init_unchained() internal onlyInitializing {}
 
     function _reserve(
         address from_,
@@ -151,8 +149,6 @@ contract ERC20Reservable is ERC20Upgradeable {
     }
 
     function balanceOf(address account) public view virtual override returns (uint256 amount) {
-        return ERC20Upgradeable.balanceOf(account) - _totalReserved[account];
+        return ERC20.balanceOf(account) - _totalReserved[account];
     }
-
-    uint256[50] private __gap;
 }

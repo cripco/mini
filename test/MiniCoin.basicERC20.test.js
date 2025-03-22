@@ -39,6 +39,11 @@ describe('MiniCoin - Basic ERC20 functions', function () {
         it('Token version is ' + TestHelper.VERSION, async () => {
             expect(await MiniCoin.version()).to.equal(TestHelper.VERSION);
         });
+
+        it('Supply verification for total supply as ' + TestHelper.TOTALSUPPLY, async () => {
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(TestHelper.TOTALSUPPLY);
+            expect(await MiniCoin.totalSupply()).to.equal(TestHelper.TOTALSUPPLY);
+        });
     });
 
     describe('MiniCoin - Allowance', async function () {

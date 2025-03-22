@@ -9,8 +9,8 @@ const NAME = 'mini';
 const SYMBOL = 'mini';
 const DECIMALS = 18;
 const TOTALSUPPLY = ethers.utils.parseUnits('100000000000', DECIMALS);
-const VERSION = '1.0';
-const VERSION_712 = '1.0';
+const VERSION = '1';
+const VERSION_712 = '1';
 
 const STANDARD_MINT_AMOUNT = ethers.utils.parseEther('1000');
 const ETHLESS_TRANSFER_SIGNATURE = 'transfer(address,address,uint256,uint256,uint8,bytes32,bytes32)';
@@ -64,13 +64,11 @@ const setupContractTesting = async (owner) => {
     const FactoryMiniCoin = await ethers.getContractFactory('MiniCoin');
     let MiniCoin;
     if (network.name === 'hardhat') {
-        MiniCoin = await upgrades.deployProxy(FactoryMiniCoin, [owner.address, NAME, SYMBOL, TOTALSUPPLY], {
-            initializer: 'initialize'
-        });
+        MiniCoin = await FactoryMiniCoin.deploy(owner.address, NAME, SYMBOL, TOTALSUPPLY);
 
         await MiniCoin.deployed();
     } else {
-        const MiniCoinAddress = await addressBook.retrieveContract('UpgradeableMiniCoin', network.name);
+        const MiniCoinAddress = await addressBook.retrieveContract('MiniCoin', network.name);
 
         MiniCoin = await new ethers.Contract(MiniCoinAddress, FactoryMiniCoin.interface, owner.address);
         if (!skipInitializeContracts) {
