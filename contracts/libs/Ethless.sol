@@ -5,12 +5,12 @@ pragma solidity ^0.8.13;
  * @title Ethless
  */
 
-import '@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol';
 
 import './ERC20Reservable.sol';
 
-contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
-    using ECDSAUpgradeable for bytes32;
+abstract contract Ethless is ERC20Permit, ERC20Reservable {
+    using ECDSA for bytes32;
 
     // keccak256("Transfer(address sender,address recipient,uint256 amount,uint256 nonce,uint256 deadline)")
     bytes32 private constant _TRANSFER_TYPEHASH = 0xa43cfdcd630933b29083d1c5116d122bcc478eab04dd62c15dd45c3bdc58ce85;
@@ -24,8 +24,6 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
     }
 
     mapping(address => mapping(uint256 => mapping(EthlessTxnType => bool))) private _nonceUsed;
-
-    function __Ethless_init_unchained() internal onlyInitializing {}
 
     function _useNonce(
         address signer_,
@@ -63,7 +61,7 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
 
         bytes32 hash = _hashTypedDataV4(structHash);
 
-        address signer = ECDSAUpgradeable.recover(hash, v, r, s);
+        address signer = ECDSA.recover(hash, v, r, s);
         require(signer == sender, 'Ethless: invalid signature');
 
         _transfer(signer, recipient, amount);
@@ -101,15 +99,7 @@ contract Ethless is ERC20PermitUpgradeable, ERC20Reservable {
         return true;
     }
 
-    function balanceOf(address account)
-        public
-        view
-        virtual
-        override(ERC20Upgradeable, ERC20Reservable)
-        returns (uint256 amount)
-    {
+    function balanceOf(address account) public view virtual override(ERC20, ERC20Reservable) returns (uint256 amount) {
         return ERC20Reservable.balanceOf(account);
     }
-
-    uint256[50] private __gap;
 }
