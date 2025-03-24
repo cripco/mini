@@ -17,7 +17,7 @@ contract MiniCoinTest is DSTest, SharedHelper {
 
     function setUp() public {
         // Deploy contracts
-        miniCoin = new MiniCoin(address(this), 'mini', 'mini', 10 * 10**24);
+        miniCoin = new MiniCoin(address(this), 'mini', 'mini', 10 * 10 ** 24);
 
         initialize_helper(LOG_LEVEL, address(miniCoin), address(this));
         if (LOG_LEVEL > 0) _changeLogLevel(LOG_LEVEL);
@@ -57,6 +57,28 @@ contract MiniCoinTest is DSTest, SharedHelper {
             deadline,
             'Ethless: invalid signature'
         );
+    }
+
+    function test_MiniCoin_ethless_transfer_wrongSender() public {
+        uint256 amountToTransfer = 1000;
+        uint256 deadline = block.number + 100;
+        uint256 nonce = miniCoin.nonces(USER1);
+        miniCoin.transfer(USER1, amountToTransfer);
+        uint256 lowerAmountToTransfer = amountToTransfer - 18;
+
+        (uint8 signV, bytes32 signR, bytes32 signS) = eip712_sign_transfer(
+            USER2,
+            USER2_PRIVATEKEY,
+            USER3,
+            lowerAmountToTransfer,
+            nonce,
+            deadline
+        );
+
+        vm.prank(USER3);
+        vm.expectRevert(bytes('Ethless: invalid signature'));
+        MiniCoin(_miniCoin).transferBySignature(USER1, USER3, lowerAmountToTransfer, deadline, signV, signR, signS);
+        assertEq(MiniCoin(_miniCoin).balanceOf(USER1), amountToTransfer);
     }
 
     function test_MiniCoin_ethless_transfer_topUpInBetween() public {
