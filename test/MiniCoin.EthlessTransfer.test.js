@@ -153,6 +153,42 @@ describe('MiniCoin - Ethless Transfer functions', function () {
             );
         });
 
+        it('Test Ethless transfer while using the signed by different sender', async () => {
+            const originalBalance = await MiniCoin.balanceOf(owner.address);
+
+            const [blockNumber, nonce] = await Promise.all([provider.getBlockNumber(), MiniCoin.nonces(owner.address)]);
+
+            const block = await provider.getBlock(blockNumber);
+            const expirationTimestamp = block.timestamp + 20000;
+
+            const splitSignature = await SignHelper.signTransfer(
+                TestHelper.NAME,
+                TestHelper.VERSION_712,
+                MiniCoin.address,
+                user3,
+                user2.address,
+                amountToTransfer,
+                nonce.toNumber(),
+                expirationTimestamp
+            );
+            const input = await MiniCoin.populateTransaction[TestHelper.ETHLESS_TRANSFER_SIGNATURE](
+                owner.address,
+                user2.address,
+                amountToTransfer,
+                expirationTimestamp,
+                splitSignature.v,
+                splitSignature.r,
+                splitSignature.s
+            );
+
+            await TestHelper.submitTxnAndCheckResult(input, MiniCoin.address, user3, ethers, provider, ErrorMessages.ETHLESS_INVALID_SIGNATURE);
+
+            expect(await MiniCoin.balanceOf(owner.address)).to.equal(
+                ethers.BigNumber.from(originalBalance)
+            );
+            expect(await MiniCoin.balanceOf(user2.address)).to.equal(0);
+        });
+
         it('Test Ethless transfer while reusing the same nonce on the second transfer', async () => {
             const originalBalance = await MiniCoin.balanceOf(owner.address);
 

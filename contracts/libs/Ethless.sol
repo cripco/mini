@@ -44,7 +44,7 @@ abstract contract Ethless is ERC20Permit, ERC20Reservable {
         require(signer == signer_, 'Ethless: invalid signature');
     }
 
-    function transfer(
+    function transferBySignature(
         address sender,
         address recipient,
         uint256 amount,

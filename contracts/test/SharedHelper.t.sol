@@ -262,7 +262,7 @@ contract SharedHelper is DSTest {
         if (bytes(revertMsg).length > 0) {
             vm.expectRevert(bytes(revertMsg));
         }
-        MiniCoin(_miniCoin).transfer(signer_, recipient_, amountToTransfer_, deadline_, signV, signR, signS);
+        MiniCoin(_miniCoin).transferBySignature(signer_, recipient_, amountToTransfer_, deadline_, signV, signR, signS);
     }
 
     function eip191_reserve_verified(
