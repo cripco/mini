@@ -13,7 +13,7 @@ const VERSION = '1';
 const VERSION_712 = '1';
 
 const STANDARD_MINT_AMOUNT = ethers.utils.parseEther('1000');
-const ETHLESS_TRANSFER_SIGNATURE = 'transfer(address,address,uint256,uint256,uint8,bytes32,bytes32)';
+const ETHLESS_TRANSFER_SIGNATURE = 'transferBySignature(address,address,uint256,uint256,uint8,bytes32,bytes32)';
 
 let skipInitializeContracts = false;
 
